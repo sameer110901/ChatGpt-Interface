@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .user-message {
+            text-align: right;
+            color: blue;
+        }
+        .gpt-message {
+            text-align: left;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h2>Chat with ChatGPT</h2>
+    <div id="messages"></div>
+    <input type="text" id="userInput" placeholder="Type your message here..." />
+    <button id="sendButton">Send</button>
+
+    <script>
+        const sendButton = document.getElementById('sendButton');
+        const userInput = document.getElementById('userInput');
+        const messagesDiv = document.getElementById('messages');
+
+        sendButton.addEventListener('click', async () => {
+            const userMessage = userInput.value;
+            if (!userMessage) return;
+
+            // Display user's message
+            messagesDiv.innerHTML += `<div class="user-message">You: ${userMessage}</div>`;
+            userInput.value = '';
+
+            // Call the ChatGPT API
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer YOUR_API_KEY`
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [{ role: "user", content: userMessage }]
+                })
+            });
+            const data = await response.json();
+            const gptMessage = data.choices[0].message.content;
+
+            // Display GPT's response
+            messagesDiv.innerHTML += `<div class="gpt-message">ChatGPT: ${gptMessage}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto scroll to the bottom
+        });
+    </script>
+</body>
+</html>
